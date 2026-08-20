@@ -1,19 +1,6 @@
-/// <reference types="@citizenfx/server" />
+import {Core} from "./core";
 
-export class ServerPlayer {
-    constructor(public readonly source: number) {
-    }
+export * from '../shared/index';
+export * from './entities/player';
 
-    get name(): string {
-        return GetPlayerName(String(this.source));
-    }
-
-    drop(reason: string) {
-        DropPlayer(String(this.source), reason);
-    }
-}
-
-export const Server = {
-    onNet: (event: string, handler: (...args: any[]) => void) => onNet(event, handler),
-    emitNet: (event: string, target: number | string, ...args: any[]) => emitNet(event, target, ...args)
-};
+export const fx = new Core();
