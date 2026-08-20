@@ -3,6 +3,7 @@ import {CommandManager} from "./managers/command-manager";
 import {LocalPlayer} from "./entities/local-player";
 import {Vector3} from "../shared";
 import {registerInternalHandlers} from "./internal";
+import {registerBlipHandlers} from "./blips-internal";
 
 export class Core {
     readonly events = new EventManager();
@@ -12,5 +13,6 @@ export class Core {
 
     constructor() {
         registerInternalHandlers();
+        registerBlipHandlers();
     }
 }
