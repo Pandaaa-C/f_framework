@@ -1,33 +1,36 @@
 {
-  "name": "@panda0day/f_framework",
-  "version": "0.1.0",
-  "type": "module",
-  "files": ["dist"],
-  "exports": {
-    "./client": {
-      "types": "./dist/client/index.d.ts",
-      "default": "./dist/client/index.js"
-    },
-    "./server": {
-      "types": "./dist/server/index.d.ts",
-      "default": "./dist/server/index.js"
-    },
-    "./shared": {
-      "types": "./dist/shared/index.d.ts",
-      "default": "./dist/shared/index.js"
-    }
-  },
-  "scripts": {
-    "build": "tsc -p tsconfig.client.json && tsc -p tsconfig.server.json",
-    "prepare": "npm run build"
-  },
-  "peerDependencies": {
-    "@citizenfx/client": "*",
-    "@citizenfx/server": "*"
-  },
-  "devDependencies": {
-    "@citizenfx/client": "^2.0.35214-1",
-    "@citizenfx/server": "^2.0.35214-1",
-    "typescript": "^6.0.3"
-  }
+	"name": "@panda0day/f_framework",
+	"version": "0.1.0",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		"./client": {
+			"types": "./dist/client/index.d.ts",
+			"default": "./dist/client/index.js"
+		},
+		"./server": {
+			"types": "./dist/server/index.d.ts",
+			"default": "./dist/server/index.js"
+		},
+		"./shared": {
+			"types": "./dist/shared/index.d.ts",
+			"default": "./dist/shared/index.js"
+		}
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.client.json && tsc -p tsconfig.server.json",
+		"prepare": "npm run build"
+	},
+	"peerDependencies": {
+		"@citizenfx/client": "*",
+		"@citizenfx/server": "*"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.12",
+		"@citizenfx/client": "^2.0.35214-1",
+		"@citizenfx/server": "^2.0.35214-1",
+		"typescript": "^6.0.3"
+	}
 }

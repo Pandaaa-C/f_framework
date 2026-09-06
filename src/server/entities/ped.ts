@@ -1,3 +1,3 @@
-import {Entity} from "./entity";
+import { Entity } from "./entity";
 
 export class Ped extends Entity {}

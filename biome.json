@@ -5,7 +5,11 @@
 			"preset": "recommended",
 			"nursery": {
 				"noFloatingPromises": "error"
-			}
+			},
+			"suspicious": { "noExplicitAny": "off" }
 		}
+	},
+	"files": {
+		"includes": ["**", "!dist", "!**/*.d.ts", "!node_modules"]
 	}
 }
