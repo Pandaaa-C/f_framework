@@ -1,13 +1,15 @@
 /// <reference types="@citizenfx/client" />
 
 import {Vector3} from "../../shared";
+import {entityState} from "../internal/state";
 
 export class Entity {
     public get handle(): number {
         return this._handle;
     }
 
-    constructor(private readonly _handle: number) {}
+    constructor(private readonly _handle: number) {
+    }
 
     get exists(): boolean {
         return DoesEntityExist(this.handle);
@@ -48,5 +50,9 @@ export class Entity {
 
     delete(): void {
         DeleteEntity(this.handle);
+    }
+
+    getVariable<T = unknown>(key: string): T | undefined {
+        return entityState(this.handle)[key] as T | undefined;
     }
 }
