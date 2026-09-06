@@ -11,4 +11,10 @@ export class EventManager {
             handler(new Player(src), ...args);
         });
     }
+
+    addCommand(name: string, handler: (player: Player | null, args: string[], raw: string) => void, restricted = false): void {
+        RegisterCommand(name, (src: number, args: string[], raw: string) => {
+            handler(src > 0 ? new Player(src) : null, args, raw);
+        }, restricted);
+    }
 }
