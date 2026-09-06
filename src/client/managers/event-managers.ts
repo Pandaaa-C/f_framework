@@ -16,4 +16,10 @@ export class EventManager {
     callRemote(name: string, ...args: any[]): void {
         emitNet(name, ...args);
     }
+
+    addCommand(name: string, handler: (args: string[], raw: string) => void, restricted = false): void {
+        RegisterCommand(name, (_s: number, args: string[], raw: string) => {
+            handler(args, raw);
+        }, restricted);
+    }
 }

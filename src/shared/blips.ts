@@ -1,8 +1,8 @@
-import {Vector3} from "./math/vector3";
+import {IVector3} from "./math/vector3";
 
 export interface BlipData {
     id: number;
-    coords: Vector3;
+    coords: IVector3;
     sprite?: number;
     color?: number;
     scale?: number;
