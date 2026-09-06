@@ -1,83 +1,98 @@
-import { Net, type Vector3 } from "../../shared";
-import { playerState } from "../internal/state";
-import { serverRpc } from "../managers/rpc";
-import { Ped } from "./ped";
+import {Net, Vector3} from "../../shared";
+import {playerState} from "../internal/state";
+import {serverRpc} from "../managers/rpc";
+import {Ped} from "./ped";
+import {Entity} from "./entity";
 
-export class Player {
-	constructor(public readonly source: number) {}
+export class Player extends Entity{
+    constructor(public readonly source: number) {
+		super(source);
+    }
 
-	get name(): string {
-		return GetPlayerName(String(this.source));
-	}
+    get name(): string {
+        return GetPlayerName(String(this.source));
+    }
 
-	get ped(): Ped {
-		return new Ped(GetPlayerPed(String(this.source)));
-	}
+    get ped(): Ped {
+        return new Ped(GetPlayerPed(String(this.source)));
+    }
 
-	get position(): Vector3 {
-		return this.ped.position;
-	}
+    get position(): Vector3 {
+        return this.ped.position;
+    }
 
-	get identifiers(): Record<string, string> {
-		const out: Record<string, string> = {};
-		const count = GetNumPlayerIdentifiers(String(this.source));
+    get rotation(): Vector3 {
+        return Vector3.from(GetEntityRotation(GetPlayerPed(String(this.source))));
+    }
 
-		for (let i = 0; i < count; i++) {
-			const id = GetPlayerIdentifier(String(this.source), i);
-			const idx = id.indexOf(":");
+    get heading(): number {
+        return GetEntityHeading(GetPlayerPed(String(this.source)));
+    }
 
-			if (idx !== -1) out[id.slice(0, idx)] = id.slice(idx + 1);
-		}
+    get identifiers(): Record<string, string> {
+        const out: Record<string, string> = {};
+        const count = GetNumPlayerIdentifiers(String(this.source));
 
-		return out;
-	}
+        for (let i = 0; i < count; i++) {
+            const id = GetPlayerIdentifier(String(this.source), i);
+            const idx = id.indexOf(":");
 
-	get dimension(): number {
-		return GetPlayerRoutingBucket(String(this.source));
-	}
+            if (idx !== -1) out[id.slice(0, idx)] = id.slice(idx + 1);
+        }
 
-	setHealth(value: number): void {
-		emitNet(Net.setHealth, this.source, value);
-	}
+        return out;
+    }
 
-	setArmour(value: number): void {
-		emitNet(Net.setArmour, this.source, value);
-	}
+    get dimension(): number {
+        return GetPlayerRoutingBucket(String(this.source));
+    }
 
-	setPosition(v: Vector3): void {
-		emitNet(Net.setPosition, this.source, v.x, v.y, v.z);
-	}
+    setHealth(value: number): void {
+        emitNet(Net.setHealth, this.source, value);
+    }
 
-	call(name: string, ...args: any[]): void {
-		emitNet(name, this.source, ...args);
-	}
+    setArmour(value: number): void {
+        emitNet(Net.setArmour, this.source, value);
+    }
 
-	drop(reason: string): void {
-		DropPlayer(String(this.source), reason);
-	}
+    setPosition(v: Vector3): void {
+        emitNet(Net.setPosition, this.source, v.x, v.y, v.z);
+    }
 
-	getIdentifier(prefix: string): string | undefined {
-		const count = GetNumPlayerIdentifiers(String(this.source));
-		for (let i = 0; i < count; i++) {
-			const id = GetPlayerIdentifier(String(this.source), i);
-			if (id.startsWith(prefix)) return id;
-		}
-		return undefined;
-	}
+    setRotation(v: Vector3): void {
+        emitNet(Net.setRotation, this.source, v.x, v.y, v.z);
+    }
 
-	set dimension(bucket: number) {
-		SetPlayerRoutingBucket(String(this.source), bucket);
-	}
+    call(name: string, ...args: any[]): void {
+        emitNet(name, this.source, ...args);
+    }
 
-	getVariable<T = unknown>(key: string): T | undefined {
-		return playerState(String(this.source))[key] as T | undefined;
-	}
+    drop(reason: string): void {
+        DropPlayer(String(this.source), reason);
+    }
 
-	setVariable(key: string, value: unknown): void {
-		playerState(String(this.source)).set(key, value, true);
-	}
+    getIdentifier(prefix: string): string | undefined {
+        const count = GetNumPlayerIdentifiers(String(this.source));
+        for (let i = 0; i < count; i++) {
+            const id = GetPlayerIdentifier(String(this.source), i);
+            if (id.startsWith(prefix)) return id;
+        }
+        return undefined;
+    }
 
-	callProc<T = unknown>(name: string, ...args: unknown[]): Promise<T> {
-		return serverRpc.call<T>(this.source, name, args);
-	}
+    set dimension(bucket: number) {
+        SetPlayerRoutingBucket(String(this.source), bucket);
+    }
+
+    getVariable<T = unknown>(key: string): T | undefined {
+        return playerState(String(this.source))[key] as T | undefined;
+    }
+
+    setVariable(key: string, value: unknown): void {
+        playerState(String(this.source)).set(key, value, true);
+    }
+
+    callProc<T = unknown>(name: string, ...args: unknown[]): Promise<T> {
+        return serverRpc.call<T>(this.source, name, args);
+    }
 }

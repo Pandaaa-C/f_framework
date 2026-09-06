@@ -13,4 +13,8 @@ export function registerInternalHandlers(): void {
 	onNet(Net.setPosition, (x: number, y: number, z: number) => {
 		SetEntityCoords(PlayerPedId(), x, y, z, false, false, false, true);
 	});
+
+	onNet(Net.setRotation, (x: number, y: number, z: number) => {
+		SetEntityRotation(PlayerPedId(), x, y, z, 2, true);
+	});
 }
