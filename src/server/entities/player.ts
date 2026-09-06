@@ -27,7 +27,32 @@ export class Player {
     call(name: string, ...args: any[]): void {
         emitNet(name, this.source, ...args);
     }
+
     drop(reason: string): void {
         DropPlayer(String(this.source), reason);
+    }
+
+    getIdentifier(prefix: string): string | undefined {
+        const count = GetNumPlayerIdentifiers(String(this.source));
+        for (let i = 0; i < count; i++) {
+            const id = GetPlayerIdentifier(String(this.source), i);
+            if (id.startsWith(prefix)) return id;
+        }
+
+        return undefined;
+    }
+
+    get identifiers() : Record<string, string> {
+        const out: Record<string, string> = {};
+        const count = GetNumPlayerIdentifiers(String(this.source));
+
+        for (let i = 0; i < count; i++) {
+            const id = GetPlayerIdentifier(String(this.source), i);
+            const idx = id.indexOf(':');
+
+            if (idx !== -1) out[id.slice(0, idx)] = id.slice(idx + 1);
+        }
+
+        return out;
     }
 }
