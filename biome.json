@@ -1,0 +1,11 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.12/schema.json",
+	"linter": {
+		"rules": {
+			"preset": "recommended",
+			"nursery": {
+				"noFloatingPromises": "error"
+			}
+		}
+	}
+}
