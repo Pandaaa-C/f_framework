@@ -31,6 +31,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.12",
+		"@changesets/cli": "^3.0.2",
 		"@citizenfx/client": "^2.0.35214-1",
 		"@citizenfx/server": "^2.0.35214-1",
 		"typescript": "^6.0.3"
