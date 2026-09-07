@@ -1,5 +1,5 @@
 /// <reference types="@citizenfx/server" />
-import {Net, Vector3} from "../../shared";
+import { Net, Vector3 } from "../../shared";
 import { entityState } from "../internal/state";
 
 export class Entity {

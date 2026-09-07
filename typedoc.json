@@ -1,9 +1,9 @@
 {
-  "entryPoints": [
-    "src/client/index.ts",
-    "src/server/index.ts",
-    "src/shared/index.ts"
-  ],
-  "out": "docs-api",
-  "skipErrorChecking": true
+	"entryPoints": [
+		"src/client/index.ts",
+		"src/server/index.ts",
+		"src/shared/index.ts"
+	],
+	"out": "docs-api",
+	"skipErrorChecking": true
 }
