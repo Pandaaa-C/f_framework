@@ -21,7 +21,9 @@
 	},
 	"scripts": {
 		"build": "tsc -p tsconfig.client.json && tsc -p tsconfig.server.json",
-		"prepare": "npm run build"
+		"typecheck": "tsc --noEmit -p tsconfig.client.json && tsc --noEmit -p tsconfig.server.json",
+		"lint": "biome check .",
+		"format": "biome check --write ."
 	},
 	"peerDependencies": {
 		"@citizenfx/client": "*",
