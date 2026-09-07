@@ -3,7 +3,7 @@ import { Vector3 } from "../shared";
 import { registerBlipHandlers } from "./blips-internal";
 import { LocalPlayer } from "./entities/local-player";
 import { registerInternalHandlers } from "./internal";
-import { EventManager } from "./managers/event-managers";
+import { EventManager } from "./managers/event-manager";
 
 export class Core {
 	readonly events = new EventManager();

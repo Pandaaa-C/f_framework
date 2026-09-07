@@ -23,7 +23,8 @@
 		"build": "tsc -p tsconfig.client.json && tsc -p tsconfig.server.json",
 		"typecheck": "tsc --noEmit -p tsconfig.client.json && tsc --noEmit -p tsconfig.server.json",
 		"lint": "biome check .",
-		"format": "biome check --write ."
+		"format": "biome check --write .",
+		"docs": "typedoc"
 	},
 	"peerDependencies": {
 		"@citizenfx/client": "*",
@@ -31,8 +32,10 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.12",
+		"@changesets/cli": "^3.0.2",
 		"@citizenfx/client": "^2.0.35214-1",
 		"@citizenfx/server": "^2.0.35214-1",
+		"typedoc": "^0.28.20",
 		"typescript": "^6.0.3"
 	}
 }
