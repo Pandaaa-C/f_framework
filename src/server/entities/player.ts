@@ -33,20 +33,21 @@ export class Player {
         return this.ped.heading;
     }
 
+    get velocity(): Vector3 {
+        const [x, y, z] = GetEntityVelocity(this.ped.handle);
+        return new Vector3(x, y, z);
+    }
+
+    get speed(): number {
+        return GetEntitySpeed(this.ped.handle);
+    }
+
     get health(): number {
         return this.ped.health;
     }
 
     get armour(): number {
         return this.ped.armour;
-    }
-
-    get ping(): number {
-        return GetPlayerPing(String(this.source));
-    }
-
-    get isInvincible(): boolean {
-        return GetPlayerInvincible(String(this.source));
     }
 
     get maxArmour(): number {
@@ -57,8 +58,28 @@ export class Player {
         return GetPlayerMaxHealth(String(this.source));
     }
 
-    get wantedLevel(): number {
-        return GetPlayerWantedLevel(String(this.source));
+    get dead(): boolean {
+        return this.health <= 0;
+    }
+
+    get ping(): number {
+        return GetPlayerPing(String(this.source));
+    }
+
+    get ip(): string {
+        return GetPlayerEndpoint(String(this.source));
+    }
+
+    get lastMsg(): number {
+        return GetPlayerLastMsg(String(this.source));
+    }
+
+    get model(): number {
+        return GetEntityModel(this.ped.handle);
+    }
+
+    set model(model: string | number) {
+        SetPlayerModel(String(this.source), this.h(model));
     }
 
     get identifiers(): Record<string, string> {
@@ -75,6 +96,39 @@ export class Player {
     getIdentifier(prefix: string): string | undefined {
         const key = prefix.endsWith(":") ? prefix.slice(0, -1) : prefix;
         return this.identifiers[key];
+    }
+
+    isAceAllowed(object: string): boolean {
+        return IsPlayerAceAllowed(String(this.source), object);
+    }
+
+    get vehicle(): Vehicle | undefined {
+        const veh = GetVehiclePedIsIn(this.ped.handle, false);
+        return veh !== 0 ? new Vehicle(veh) : undefined;
+    }
+
+    get seat(): number {
+        return GetSeatPedIsUsing(this.ped.handle);
+    }
+
+    get isInVehicle(): boolean {
+        return IsPedInAnyVehicle(this.ped.handle);
+    }
+
+    get isRagdoll(): boolean {
+        return IsPedRagdoll(this.ped.handle);
+    }
+
+    get isHandcuffed(): boolean {
+        return IsPedHandcuffed(this.ped.handle);
+    }
+
+    get isInvincible(): boolean {
+        return GetPlayerInvincible(String(this.source));
+    }
+
+    get wantedLevel(): number {
+        return GetPlayerWantedLevel(String(this.source));
     }
 
     get dimension(): number {
@@ -121,22 +175,6 @@ export class Player {
         this.setWantedLevel(0);
     }
 
-    notify(message: string): void {
-        emitNet(Net.notify, this.source, message);
-    }
-
-    spawn(coords: IVector3, heading = 0): void {
-        emitNet(Net.spawn, this.source, coords.x, coords.y, coords.z, heading);
-    }
-
-    get weapons(): PlayerWeapons {
-        return new PlayerWeapons(this);
-    }
-
-    set model(model: string | number) {
-        SetPlayerModel(String(this.source), this.h(model));
-    }
-
     setComponent(
         componentId: number,
         drawable: number,
@@ -154,6 +192,38 @@ export class Player {
 
     setProp(propId: number, drawable: number, texture: number): void {
         SetPedPropIndex(this.ped.handle, propId, drawable, texture, true);
+    }
+
+    warpIntoVehicle(vehicle: Vehicle | number, seat = -1): void {
+        const veh = typeof vehicle === "number" ? vehicle : vehicle.handle;
+        TaskWarpPedIntoVehicle(this.ped.handle, veh, seat);
+    }
+
+    setIntoVehicle(vehicle: Vehicle | number, seat = -1): void {
+        const veh = typeof vehicle === "number" ? vehicle : vehicle.handle;
+        SetPedIntoVehicle(this.ped.handle, veh, seat);
+    }
+
+    leaveVehicle(flags = 0): void {
+        const veh = GetVehiclePedIsIn(this.ped.handle, false);
+        if (veh !== 0) TaskLeaveVehicle(this.ped.handle, veh, flags);
+    }
+
+    clearTasks(immediately = false): void {
+        if (immediately) ClearPedTasksImmediately(this.ped.handle);
+        else ClearPedTasks(this.ped.handle);
+    }
+
+    get weapons(): PlayerWeapons {
+        return new PlayerWeapons(this);
+    }
+
+    notify(message: string): void {
+        emitNet(Net.notify, this.source, message);
+    }
+
+    spawn(coords: IVector3, heading = 0): void {
+        emitNet(Net.spawn, this.source, coords.x, coords.y, coords.z, heading);
     }
 
     call(name: string, ...args: any[]): void {
@@ -175,62 +245,5 @@ export class Player {
 
     drop(reason: string): void {
         DropPlayer(String(this.source), reason);
-    }
-
-    get ip(): string {
-        return GetPlayerEndpoint(String(this.source));
-    }
-
-    get vehicle(): Vehicle | undefined {
-        const veh = GetVehiclePedIsIn(this.ped.handle, false);
-        return veh !== 0 ? new Vehicle(veh) : undefined;
-    }
-
-    get seat(): number | null {
-        const veh = GetVehiclePedIsIn(this.ped.handle, false);
-        if (veh === 0) return null;
-
-        const ped = this.ped.handle;
-        for (let i = -1; i < 16; i++) {
-            if (GetPedInVehicleSeat(veh, i) === ped) return i;
-        }
-        return null;
-    }
-
-    get isInVehicle(): boolean {
-        return IsPedInAnyVehicle(this.ped.handle);
-    }
-
-    get isRagdoll(): boolean {
-        return IsPedRagdoll(this.ped.handle);
-    }
-
-    get isHandcuffed(): boolean {
-        return IsPedHandcuffed(this.ped.handle);
-    }
-
-    get dead(): boolean {
-        return this.health <= 0;
-    }
-
-    get speed(): number {
-        return GetEntitySpeed(this.ped.handle);
-    }
-
-    get velocity(): Vector3 {
-        const [x, y, z] = GetEntityVelocity(this.ped.handle);
-        return new Vector3(x, y, z);
-    }
-
-    get model(): number {
-        return GetEntityModel(this.ped.handle);
-    }
-
-    get lastMsg(): number {
-        return GetPlayerLastMsg(String(this.source));
-    }
-
-    isAceAllowed(object: string): boolean {
-        return IsPlayerAceAllowed(String(this.source), object);
     }
 }
