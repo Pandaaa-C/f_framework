@@ -1,99 +1,182 @@
-import { type IVector3, Net, type Vector3 } from "../../shared";
-import { playerState } from "../internal/state";
-import { serverRpc } from "../managers/rpc";
-import { Ped } from "./ped";
+import {type IVector3, Net, type Vector3} from "../../shared";
+import {playerState} from "../internal/state";
+import {serverRpc} from "../managers/rpc";
+import {Ped} from "./ped";
 
 export class Player {
-	constructor(public readonly source: number) {}
+    constructor(public readonly source: number) {
+    }
 
-	get name(): string {
-		return GetPlayerName(String(this.source));
-	}
+    private h(value: string | number): number {
+        return typeof value === "string" ? GetHashKey(value) : value;
+    }
 
-	get ped(): Ped {
-		return new Ped(GetPlayerPed(String(this.source)));
-	}
+    get name(): string {
+        return GetPlayerName(String(this.source));
+    }
 
-	get position(): Vector3 {
-		return this.ped.position;
-	}
+    get ped(): Ped {
+        return new Ped(GetPlayerPed(String(this.source)));
+    }
 
-	get rotation(): Vector3 {
-		return this.ped.rotation;
-	}
+    get position(): Vector3 {
+        return this.ped.position;
+    }
 
-	get heading(): number {
-		return this.ped.heading;
-	}
+    get rotation(): Vector3 {
+        return this.ped.rotation;
+    }
 
-	get health(): number {
-		return this.ped.health;
-	}
+    get heading(): number {
+        return this.ped.heading;
+    }
 
-	get armour(): number {
-		return this.ped.armour;
-	}
+    get health(): number {
+        return this.ped.health;
+    }
 
-	get identifiers(): Record<string, string> {
-		const out: Record<string, string> = {};
-		const count = GetNumPlayerIdentifiers(String(this.source));
+    get armour(): number {
+        return this.ped.armour;
+    }
 
-		for (let i = 0; i < count; i++) {
-			const id = GetPlayerIdentifier(String(this.source), i);
-			const idx = id.indexOf(":");
+    get ping(): number {
+        return GetPlayerPing(String(this.source));
+    }
 
-			if (idx !== -1) out[id.slice(0, idx)] = id.slice(idx + 1);
-		}
+    get isInvincible(): boolean {
+        return GetPlayerInvincible(String(this.source));
+    }
 
-		return out;
-	}
+    get maxArmour(): number {
+        return GetPlayerMaxArmour(String(this.source));
+    }
 
-	getIdentifier(prefix: string): string | undefined {
-		const key = prefix.endsWith(":") ? prefix.slice(0, -1) : prefix;
-		return this.identifiers[key];
-	}
+    get maxHealth(): number {
+        return GetPlayerMaxHealth(String(this.source));
+    }
 
-	get dimension(): number {
-		return GetPlayerRoutingBucket(String(this.source));
-	}
+    get wantedLevel(): number {
+        return GetPlayerWantedLevel(String(this.source));
+    }
 
-	set dimension(bucket: number) {
-		SetPlayerRoutingBucket(String(this.source), bucket);
-	}
+    get identifiers(): Record<string, string> {
+        const out: Record<string, string> = {};
+        const count = GetNumPlayerIdentifiers(String(this.source));
+        for (let i = 0; i < count; i++) {
+            const id = GetPlayerIdentifier(String(this.source), i);
+            const idx = id.indexOf(":");
+            if (idx !== -1) out[id.slice(0, idx)] = id.slice(idx + 1);
+        }
+        return out;
+    }
 
-	getVariable<T = unknown>(key: string): T | undefined {
-		return playerState(String(this.source))[key] as T | undefined;
-	}
+    getIdentifier(prefix: string): string | undefined {
+        const key = prefix.endsWith(":") ? prefix.slice(0, -1) : prefix;
+        return this.identifiers[key];
+    }
 
-	setVariable(key: string, value: unknown): void {
-		playerState(String(this.source)).set(key, value, true);
-	}
+    get dimension(): number {
+        return GetPlayerRoutingBucket(String(this.source));
+    }
 
-	setHealth(value: number): void {
-		emitNet(Net.setHealth, this.source, value);
-	}
+    set dimension(bucket: number) {
+        SetPlayerRoutingBucket(String(this.source), bucket);
+    }
 
-	setArmour(value: number): void {
-		emitNet(Net.setArmour, this.source, value);
-	}
+    getVariable<T = unknown>(key: string): T | undefined {
+        return playerState(String(this.source))[key] as T | undefined;
+    }
 
-	setPosition(v: IVector3): void {
-		emitNet(Net.setPosition, this.source, v.x, v.y, v.z);
-	}
+    setVariable(key: string, value: unknown): void {
+        playerState(String(this.source)).set(key, value, true);
+    }
 
-	setRotation(v: IVector3): void {
-		emitNet(Net.setRotation, this.source, v.x, v.y, v.z);
-	}
+    setHealth(value: number): void {
+        emitNet(Net.setHealth, this.source, value);
+    }
 
-	call(name: string, ...args: any[]): void {
-		emitNet(name, this.source, ...args);
-	}
+    setArmour(value: number): void {
+        emitNet(Net.setArmour, this.source, value);
+    }
 
-	callProc<T = unknown>(name: string, ...args: unknown[]): Promise<T> {
-		return serverRpc.call<T>(this.source, name, args);
-	}
+    setPosition(v: IVector3): void {
+        emitNet(Net.setPosition, this.source, v.x, v.y, v.z);
+    }
 
-	drop(reason: string): void {
-		DropPlayer(String(this.source), reason);
-	}
+    setRotation(v: IVector3): void {
+        emitNet(Net.setRotation, this.source, v.x, v.y, v.z);
+    }
+
+    setInvincible(toggle: boolean): void {
+        SetPlayerInvincible(String(this.source), toggle);
+    }
+
+    setWantedLevel(level: number): void {
+        SetPlayerWantedLevel(String(this.source), level, false);
+    }
+
+    clearWantedLevel(): void {
+        this.setWantedLevel(0);
+    }
+
+    notify(message: string): void {
+        emitNet(Net.notify, this.source, message);
+    }
+
+    spawn(coords: IVector3, heading = 0): void {
+        emitNet(Net.spawn, this.source, coords.x, coords.y, coords.z, heading);
+    }
+
+    giveWeapon(weapon: string | number, ammo = 0, equip = true): void {
+        GiveWeaponToPed(this.ped.handle, this.h(weapon), ammo, false, equip);
+    }
+
+    removeWeapon(weapon: string | number): void {
+        RemoveWeaponFromPed(this.ped.handle, this.h(weapon));
+    }
+
+    removeAllWeapons(): void {
+        RemoveAllPedWeapons(this.ped.handle, true);
+    }
+
+    setAmmo(weapon: string | number, ammo: number): void {
+        SetPedAmmo(this.ped.handle, this.h(weapon), ammo);
+    }
+
+    giveWeaponComponent(weapon: string | number, component: string | number): void {
+        GiveWeaponComponentToPed(this.ped.handle, this.h(weapon), this.h(component));
+    }
+
+    set model(model: string | number) {
+        SetPlayerModel(String(this.source), this.h(model));
+    }
+
+    setComponent(componentId: number, drawable: number, texture: number, palette = 0): void {
+        SetPedComponentVariation(this.ped.handle, componentId, drawable, texture, palette);
+    }
+
+    setProp(propId: number, drawable: number, texture: number): void {
+        SetPedPropIndex(this.ped.handle, propId, drawable, texture, true);
+    }
+
+    call(name: string, ...args: any[]): void {
+        emitNet(name, this.source, ...args);
+    }
+
+    callProc<T = unknown>(name: string, ...args: unknown[]): Promise<T> {
+        return serverRpc.call<T>(this.source, name, args);
+    }
+
+    kick(reason = "Kicked"): void {
+        DropPlayer(String(this.source), reason);
+    }
+
+    ban(reason = "Banned"): void {
+        emit("fivex:playerBanned", this.source, this.identifiers, reason);
+        DropPlayer(String(this.source), reason);
+    }
+
+    drop(reason: string): void {
+        DropPlayer(String(this.source), reason);
+    }
 }
