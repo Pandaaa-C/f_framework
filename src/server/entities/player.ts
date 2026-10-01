@@ -2,6 +2,7 @@ import {type IVector3, Net, type Vector3} from "../../shared";
 import {playerState} from "../internal/state";
 import {serverRpc} from "../managers/rpc";
 import {Ped} from "./ped";
+import {PlayerWeapons} from "./player-weapons";
 
 export class Player {
     constructor(public readonly source: number) {
@@ -127,24 +128,8 @@ export class Player {
         emitNet(Net.spawn, this.source, coords.x, coords.y, coords.z, heading);
     }
 
-    giveWeapon(weapon: string | number, ammo = 0, equip = true): void {
-        GiveWeaponToPed(this.ped.handle, this.h(weapon), ammo, false, equip);
-    }
-
-    removeWeapon(weapon: string | number): void {
-        RemoveWeaponFromPed(this.ped.handle, this.h(weapon));
-    }
-
-    removeAllWeapons(): void {
-        RemoveAllPedWeapons(this.ped.handle, true);
-    }
-
-    setAmmo(weapon: string | number, ammo: number): void {
-        SetPedAmmo(this.ped.handle, this.h(weapon), ammo);
-    }
-
-    giveWeaponComponent(weapon: string | number, component: string | number): void {
-        GiveWeaponComponentToPed(this.ped.handle, this.h(weapon), this.h(component));
+    get weapons(): PlayerWeapons {
+        return new PlayerWeapons(this);
     }
 
     set model(model: string | number) {
